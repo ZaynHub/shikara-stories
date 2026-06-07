@@ -1,176 +1,240 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, Users, Award, MapPin, Headphones } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Luggage, CalendarDays, MapPin, Star } from "lucide-react";
+import heroImg from "@/assets/kashmir-hero.jpg.asset.json";
 
 const stats = [
-  { icon: Users, value: 500, suffix: "+", label: "Happy Travelers" },
-  { icon: Award, value: 10, suffix: "+", label: "Years Experience" },
-  { icon: MapPin, value: 50, suffix: "+", label: "Kashmir Destinations" },
-  { icon: Headphones, value: 24, suffix: "/7", label: "Support" },
+  { icon: Luggage, value: 500, suffix: "+", label: "Happy Travelers", decimals: 0 },
+  { icon: CalendarDays, value: 10, suffix: "+", label: "Years Experience", decimals: 0 },
+  { icon: MapPin, value: 50, suffix: "+", label: "Destinations", decimals: 0 },
+  { icon: Star, value: 4.9, suffix: "", label: "Google Rating", decimals: 1 },
 ];
 
-function Counter({ to, suffix }: { to: number; suffix: string }) {
+function Counter({ to, suffix, decimals = 0 }: { to: number; suffix: string; decimals?: number }) {
   const [n, setN] = useState(0);
   useEffect(() => {
-    const duration = 1400;
+    const duration = 2000;
     const start = performance.now();
     let raf = 0;
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / duration);
-      setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(to * eased);
       if (p < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [to]);
   return (
-    <span className="font-display text-3xl md:text-4xl font-bold text-white">
-      {n}
-      <span className="text-gold">{suffix}</span>
+    <span className="font-display text-3xl md:text-4xl font-bold text-gold">
+      {n.toFixed(decimals)}
+      {suffix}
     </span>
   );
 }
 
 export default function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const yBg = useTransform(scrollY, [0, 600], [0, 120]);
-  const yMid = useTransform(scrollY, [0, 600], [0, 60]);
-  const fade = useTransform(scrollY, [0, 400], [1, 0.3]);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        size: 2 + Math.random() * 2,
+        duration: 3 + Math.random() * 5,
+        delay: Math.random() * 5,
+        opacity: 0.4 + Math.random() * 0.4,
+        gold: Math.random() > 0.5,
+      })),
+    []
+  );
 
   return (
-    <section ref={ref} className="relative min-h-screen w-full overflow-hidden">
-      {/* Layer 1 — backdrop */}
-      <motion.div
-        style={{ y: yBg }}
-        className="absolute inset-0 bg-gradient-to-br from-emerald-deep via-kashmir-blue to-emerald-brand"
+    <section className="relative h-screen w-full overflow-hidden bg-[#0A1F44]">
+      {/* LAYER 1+2 — Image with Ken Burns + scroll parallax */}
+      <div
+        className="absolute inset-0 will-change-transform"
+        style={{ transform: `translateY(${scrollY * 0.4}px)` }}
       >
-        <div className="absolute inset-0 opacity-30 mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "radial-gradient(ellipse at 20% 10%, rgba(244,163,0,0.5), transparent 45%), radial-gradient(ellipse at 80% 30%, rgba(255,255,255,0.25), transparent 50%)",
-          }}
+        <img
+          src={heroImg.url}
+          alt="Snow-capped Kashmir mountains glowing at sunrise reflected in a still alpine lake"
+          className="absolute left-[-5%] top-[-5%] h-[110%] w-[110%] object-cover object-center animate-ken-burns"
         />
-      </motion.div>
+      </div>
 
-      {/* Layer 2 — mountain silhouettes */}
-      <motion.svg
-        style={{ y: yMid }}
-        viewBox="0 0 1440 600"
-        preserveAspectRatio="none"
-        className="absolute bottom-0 left-0 w-full h-[60%]"
-      >
-        <defs>
-          <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#0A5C36" stopOpacity="0.7" />
-            <stop offset="1" stopColor="#0A1F44" stopOpacity="0.95" />
-          </linearGradient>
-          <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1B4F8A" stopOpacity="0.6" />
-            <stop offset="1" stopColor="#0A1F44" stopOpacity="1" />
-          </linearGradient>
-        </defs>
-        <path d="M0,420 L160,260 L320,360 L480,200 L640,340 L800,240 L960,360 L1120,220 L1280,340 L1440,260 L1440,600 L0,600 Z" fill="url(#m1)" />
-        <path d="M0,500 L120,400 L260,460 L420,360 L600,460 L780,380 L960,470 L1140,380 L1300,460 L1440,400 L1440,600 L0,600 Z" fill="url(#m2)" />
-      </motion.svg>
+      {/* LAYER 3 — Gradient overlays */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(to top, #0A1F44 0%, rgba(10,31,68,0.7) 40%, rgba(10,31,68,0.2) 70%, transparent 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(10,31,68,0.6) 0%, transparent 60%)",
+        }}
+      />
 
-      {/* Dark vignette */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+      {/* LAYER 4 — Floating particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute rounded-full animate-hero-particle"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              background: p.gold ? "#C9A84C" : "#ffffff",
+              opacity: p.opacity,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
+              boxShadow: p.gold
+                ? "0 0 6px rgba(201,168,76,0.7)"
+                : "0 0 6px rgba(255,255,255,0.7)",
+            }}
+          />
+        ))}
+      </div>
 
-      {/* Layer 3 — content */}
-      <motion.div style={{ opacity: fade }} className="relative z-10 min-h-screen flex flex-col">
-        <div className="flex-1 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 pt-32 pb-40 w-full">
+      {/* LAYER 5 — Content */}
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="flex-1 flex items-center justify-center pb-[120px] px-6">
+          <div className="max-w-4xl text-center">
             <motion.span
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-dark text-cream text-xs tracking-[0.2em] uppercase mb-6"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-white text-xs md:text-sm tracking-wide"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                border: "1px solid rgba(255,255,255,0.25)",
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-              Welcome to Kashmir
+              ✈️ Kashmir's Most Trusted Travel Partner
             </motion.span>
 
-            <h1 className="font-display font-bold text-white leading-[0.95] text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+            <h1 className="mt-6 font-display font-bold leading-[1] text-white">
               <motion.span
-                initial={{ opacity: 0, y: 60 }}
+                initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="block"
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="block text-[42px] md:text-[80px]"
               >
                 Discover Paradise
               </motion.span>
               <motion.span
-                initial={{ opacity: 0, y: 60 }}
+                initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="block italic text-gold"
+                transition={{ duration: 0.8, delay: 0.7 }}
+                className="block italic text-[42px] md:text-[80px]"
+                style={{ color: "#C9A84C" }}
               >
                 on Earth
               </motion.span>
             </h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="mt-6 max-w-xl text-base md:text-lg text-cream/90"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.9 }}
+              className="mt-6 mx-auto max-w-[520px] text-base md:text-lg text-white/85"
             >
-              Experience the Magic of Kashmir with Talib's Tour &amp; Travels — curated houseboats, Himalayan
-              escapes and honeymoons crafted with love.
+              Experience the magic of Kashmir with Talib's trusted local guides
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.8 }}
-              className="mt-9 flex flex-wrap gap-4"
-            >
-              <a
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+              <motion.a
                 href="#packages"
-                className="group inline-flex items-center gap-2 px-7 py-4 rounded-full bg-gold text-charcoal font-semibold btn-3d hover:-translate-y-1 transition-transform"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
+                className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold transition-all duration-300 hover:-translate-y-[3px]"
+                style={{
+                  background: "#C9A84C",
+                  color: "#0A1F44",
+                  boxShadow: "0 8px 24px rgba(201,168,76,0.5)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.boxShadow = "0 14px 34px rgba(201,168,76,0.65)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.boxShadow = "0 8px 24px rgba(201,168,76,0.5)")
+                }
               >
                 Explore Packages
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="#plan"
-                className="inline-flex items-center gap-2 px-7 py-4 rounded-full border-2 border-white/80 text-white font-semibold hover:bg-white hover:text-charcoal transition-colors"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-white border-2 border-white transition-colors duration-300 hover:bg-white hover:text-[#0A1F44]"
               >
                 Plan My Trip
-              </a>
-            </motion.div>
+              </motion.a>
+            </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-44 md:bottom-48 flex flex-col items-center text-white/80">
-          <span className="text-[10px] tracking-[0.3em] uppercase mb-2">Scroll</span>
-          <ArrowDown className="w-5 h-5 animate-bounce-down" />
-        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
+          className="absolute left-1/2 -translate-x-1/2 bottom-[140px] md:bottom-[150px] flex flex-col items-center text-white/80"
+        >
+          <span className="text-[10px] tracking-[0.3em] uppercase mb-2">Scroll to Explore</span>
+          <motion.span
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-xl"
+          >
+            ↓
+          </motion.span>
+        </motion.div>
 
         {/* Floating stats bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="relative z-10 mx-4 md:mx-auto md:max-w-6xl -mb-16 md:-mb-20"
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10"
+          style={{
+            background: "rgba(255,255,255,0.1)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderTop: "1px solid rgba(255,255,255,0.2)",
+          }}
         >
-          <div className="glass-dark rounded-2xl p-6 md:p-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map(({ icon: Icon, value, suffix, label }) => (
-              <div key={label} className="flex items-center gap-4">
-                <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-brand grid place-items-center text-white shadow-lg">
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div className="flex flex-col">
-                  <Counter to={value} suffix={suffix} />
-                  <span className="text-xs md:text-sm text-cream/80">{label}</span>
+          <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x md:divide-white/20">
+            {stats.map(({ icon: Icon, value, suffix, label, decimals }) => (
+              <div
+                key={label}
+                className="flex items-center justify-center gap-3 md:px-4 text-center md:text-left"
+              >
+                <Icon className="w-6 h-6 text-gold shrink-0" />
+                <div className="flex flex-col items-start">
+                  <Counter to={value} suffix={suffix} decimals={decimals} />
+                  <span className="text-xs md:text-sm text-white/80 font-light">{label}</span>
                 </div>
               </div>
             ))}
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }
