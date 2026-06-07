@@ -58,7 +58,7 @@ export default function PackagesSection() {
         ))}
       </div>
 
-      <div className="grid md:grid-cols-3 gap-7">
+      <div key={filter} className="grid md:grid-cols-3 gap-7 animate-fade-in">
         {visible.map((p, i) => (
           <motion.article
             key={p.name}
