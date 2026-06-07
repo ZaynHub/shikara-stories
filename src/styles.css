@@ -147,6 +147,30 @@
 .animate-bounce-down { animation: bounce-down 1.8s ease-in-out infinite; }
 .animate-ping-ring { animation: ping-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
 
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.marquee-track { display: flex; width: max-content; will-change: transform; }
+.marquee-left { animation: marquee-left 35s linear infinite; }
+.marquee-right { animation: marquee-right 45s linear infinite; }
+.marquee-row:hover .marquee-track { animation-play-state: paused; }
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+@keyframes particle-drift {
+  0% { transform: translate(0,0); opacity: 0; }
+  20% { opacity: 0.7; }
+  100% { transform: translate(var(--tx,40px), var(--ty,-60px)); opacity: 0; }
+}
+.animate-particle { animation: particle-drift 6s ease-in-out infinite; }
+
 .tilt-card {
   transition: transform 400ms cubic-bezier(.2,.8,.2,1), box-shadow 400ms ease;
   transform-style: preserve-3d;
