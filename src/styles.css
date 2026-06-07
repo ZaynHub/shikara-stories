@@ -51,12 +51,13 @@
   --radius: 0.75rem;
 
   /* Brand palette (mapped from hex) */
-  --emerald-brand: oklch(0.42 0.12 156);     /* #0A5C36 */
-  --emerald-deep: oklch(0.33 0.10 156);
-  --gold: oklch(0.79 0.16 75);                /* #F4A300 */
-  --gold-soft: oklch(0.88 0.10 80);
-  --kashmir-blue: oklch(0.39 0.12 250);       /* #1B4F8A */
-  --navy: oklch(0.22 0.08 260);               /* #0A1F44 */
+  /* Logo palette */
+  --navy: oklch(0.24 0.07 265);               /* #0A1F44 */
+  --emerald-brand: oklch(0.24 0.07 265);      /* alias → navy #0A1F44 */
+  --emerald-deep: oklch(0.18 0.06 265);       /* darker navy */
+  --gold: oklch(0.74 0.12 82);                /* #C9A84C */
+  --gold-soft: oklch(0.86 0.08 85);
+  --kashmir-blue: oklch(0.65 0.11 240);       /* #4A90C4 */
   --cream: oklch(0.985 0.015 80);             /* #FFF8F0 */
   --charcoal: oklch(0.20 0.03 270);           /* #1A1A2E */
 
