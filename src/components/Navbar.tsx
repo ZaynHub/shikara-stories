@@ -4,15 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, Mail, MessageCircle } from "lucide-react";
 import logo from "@/assets/talib-logo.png.asset.json";
 
-const navLinks = [
+const navLinks: { label: string; to: string }[] = [
   { label: "Home", to: "/" },
-  { label: "Kashmir Tours", to: "/" },
-  { label: "Honeymoon", to: "/" },
-  { label: "Pilgrimage", to: "/" },
-  { label: "Houseboat", to: "/" },
-  { label: "Car Rental", to: "/" },
-  { label: "Gallery", to: "/" },
-  { label: "Contact", to: "/" },
+  { label: "Kashmir Tours", to: "/kashmir-tours" },
+  { label: "About", to: "/about" },
+  { label: "Gallery", to: "/gallery" },
+  { label: "Contact", to: "/contact" },
 ];
 
 export default function Navbar() {
