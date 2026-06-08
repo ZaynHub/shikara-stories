@@ -71,13 +71,15 @@ export default function Navbar() {
           <ul className="hidden lg:flex items-center gap-1">
             {navLinks.map((l) => (
               <li key={l.label}>
-                <a
-                  href="#"
+                <Link
+                  to={l.to}
                   className="relative px-3 py-2 text-sm font-medium text-charcoal/80 hover:text-emerald-brand transition-colors group"
+                  activeProps={{ className: "text-emerald-brand" }}
+                  activeOptions={{ exact: true }}
                 >
                   {l.label}
                   <span className="absolute left-3 right-3 -bottom-0.5 h-0.5 bg-gradient-brand origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -112,13 +114,13 @@ export default function Navbar() {
               <ul className="px-4 py-3 flex flex-col">
                 {navLinks.map((l) => (
                   <li key={l.label}>
-                    <a
-                      href="#"
+                    <Link
+                      to={l.to}
                       onClick={() => setOpen(false)}
                       className="block px-2 py-3 text-charcoal font-medium border-b border-border last:border-none hover:text-emerald-brand"
                     >
                       {l.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
                 <li className="pt-3">
