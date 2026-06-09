@@ -100,7 +100,7 @@ export default function Hero() {
 
       {/* LAYER 4 — Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {particles.map((p) => (
+        {PARTICLES.map((p: { id: number; left: number; top: number; size: number; duration: number; delay: number; opacity: number; gold: boolean }) => (
           <span
             key={p.id}
             className="absolute rounded-full animate-hero-particle"
