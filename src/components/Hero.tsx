@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Luggage, CalendarDays, MapPin, Star } from "lucide-react";
 import heroImg from "@/assets/kashmir-hero.jpg.asset.json";
@@ -33,6 +33,32 @@ function Counter({ to, suffix, decimals = 0 }: { to: number; suffix: string; dec
   );
 }
 
+/* seeded pseudo-random so SSR and client emit identical particles */
+function mulberry32(a: number) {
+  return function () {
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function makeParticles(seed: number) {
+  const rand = mulberry32(seed);
+  return Array.from({ length: 20 }).map((_, i) => ({
+    id: i,
+    left: rand() * 100,
+    top: rand() * 100,
+    size: 2 + rand() * 2,
+    duration: 3 + rand() * 5,
+    delay: rand() * 5,
+    opacity: 0.4 + rand() * 0.4,
+    gold: rand() > 0.5,
+  }));
+}
+
+const PARTICLES = makeParticles(42);
+
 export default function Hero() {
   const [scrollY, setScrollY] = useState(0);
 
@@ -41,21 +67,6 @@ export default function Hero() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 20 }).map((_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: 2 + Math.random() * 2,
-        duration: 3 + Math.random() * 5,
-        delay: Math.random() * 5,
-        opacity: 0.4 + Math.random() * 0.4,
-        gold: Math.random() > 0.5,
-      })),
-    []
-  );
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-[#0A1F44]">
@@ -89,7 +100,7 @@ export default function Hero() {
 
       {/* LAYER 4 — Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {particles.map((p) => (
+        {PARTICLES.map((p: { id: number; left: number; top: number; size: number; duration: number; delay: number; opacity: number; gold: boolean }) => (
           <span
             key={p.id}
             className="absolute rounded-full animate-hero-particle"

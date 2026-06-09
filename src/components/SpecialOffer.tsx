@@ -5,9 +5,11 @@ import { Flame, MessageCircle } from "lucide-react";
 const TARGET = new Date("2026-06-30T23:59:59").getTime();
 
 function useCountdown() {
-  const [t, setT] = useState(() => Math.max(0, TARGET - Date.now()));
+  const [t, setT] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setT(Math.max(0, TARGET - Date.now())), 1000);
+    const tick = () => setT(Math.max(0, TARGET - Date.now()));
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
   const days = Math.floor(t / 86400000);
