@@ -15,6 +15,13 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminPackagesRouteImport } from './routes/admin.packages'
+import { Route as AdminOffersRouteImport } from './routes/admin.offers'
+import { Route as AdminGalleryManagerRouteImport } from './routes/admin.gallery-manager'
+import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
 const KashmirToursRoute = KashmirToursRouteImport.update({
   id: '/kashmir-tours',
@@ -46,31 +53,86 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPackagesRoute = AdminPackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOffersRoute = AdminOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGalleryManagerRoute = AdminGalleryManagerRouteImport.update({
+  id: '/gallery-manager',
+  path: '/gallery-manager',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
+  id: '/enquiries',
+  path: '/enquiries',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/kashmir-tours': typeof KashmirToursRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/admin/gallery-manager': typeof AdminGalleryManagerRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/kashmir-tours': typeof KashmirToursRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/admin/gallery-manager': typeof AdminGalleryManagerRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/kashmir-tours': typeof KashmirToursRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/admin/gallery-manager': typeof AdminGalleryManagerRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +143,27 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/kashmir-tours'
+    | '/admin/dashboard'
+    | '/admin/enquiries'
+    | '/admin/gallery-manager'
+    | '/admin/offers'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin' | '/contact' | '/gallery' | '/kashmir-tours'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/gallery'
+    | '/kashmir-tours'
+    | '/admin/dashboard'
+    | '/admin/enquiries'
+    | '/admin/gallery-manager'
+    | '/admin/offers'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -91,12 +172,19 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/kashmir-tours'
+    | '/admin/dashboard'
+    | '/admin/enquiries'
+    | '/admin/gallery-manager'
+    | '/admin/offers'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   KashmirToursRoute: typeof KashmirToursRoute
@@ -146,13 +234,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/packages': {
+      id: '/admin/packages'
+      path: '/packages'
+      fullPath: '/admin/packages'
+      preLoaderRoute: typeof AdminPackagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/offers': {
+      id: '/admin/offers'
+      path: '/offers'
+      fullPath: '/admin/offers'
+      preLoaderRoute: typeof AdminOffersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/gallery-manager': {
+      id: '/admin/gallery-manager'
+      path: '/gallery-manager'
+      fullPath: '/admin/gallery-manager'
+      preLoaderRoute: typeof AdminGalleryManagerRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/enquiries': {
+      id: '/admin/enquiries'
+      path: '/enquiries'
+      fullPath: '/admin/enquiries'
+      preLoaderRoute: typeof AdminEnquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminEnquiriesRoute: typeof AdminEnquiriesRoute
+  AdminGalleryManagerRoute: typeof AdminGalleryManagerRoute
+  AdminOffersRoute: typeof AdminOffersRoute
+  AdminPackagesRoute: typeof AdminPackagesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminEnquiriesRoute: AdminEnquiriesRoute,
+  AdminGalleryManagerRoute: AdminGalleryManagerRoute,
+  AdminOffersRoute: AdminOffersRoute,
+  AdminPackagesRoute: AdminPackagesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   KashmirToursRoute: KashmirToursRoute,
