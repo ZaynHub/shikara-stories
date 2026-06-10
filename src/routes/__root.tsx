@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import LoadingScreen from "@/components/LoadingScreen";
 
 function NotFoundComponent() {
   return (
@@ -78,14 +79,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Talib's Tour & Travels — Best Kashmir Tour Packages" },
+      {
+        name: "description",
+        content:
+          "Book the best Kashmir tour packages with Talib's Tour & Travels. Honeymoon, family, adventure and pilgrimage tours from trusted local Kashmir experts.",
+      },
+      {
+        name: "keywords",
+        content:
+          "Kashmir tour packages, Kashmir travel, Gulmarg tours, Pahalgam packages, Dal Lake houseboat, Kashmir honeymoon, Srinagar tours, Sonamarg packages, Kashmir travel agent",
+      },
+      { name: "author", content: "Talib's Tour & Travels" },
+      { property: "og:title", content: "Talib's Tour & Travels — Kashmir's Trusted Travel Partner" },
+      {
+        property: "og:description",
+        content:
+          "Experience the magic of Kashmir with Talib's trusted local guides. Best prices, customized packages, 24/7 WhatsApp support.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Talib's Tour & Travels — Kashmir's Trusted Travel Partner" },
+      {
+        name: "twitter:description",
+        content: "Experience the magic of Kashmir with Talib's trusted local guides.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -122,6 +141,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <LoadingScreen />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" richColors />
