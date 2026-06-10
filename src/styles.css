@@ -193,3 +193,17 @@
   transform: perspective(1000px) rotateX(4deg) rotateY(-6deg) translateY(-6px);
   box-shadow: var(--shadow-card);
 }
+
+/* Custom scrollbar */
+html { scrollbar-color: #C9A84C #0A1F44; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0A1F44; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #b89640; }
+
+/* Loading screen */
+@keyframes loader-fill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.loader-bar-fill { animation: loader-fill 1.3s cubic-bezier(.4,0,.2,1) forwards; }
