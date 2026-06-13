@@ -17,7 +17,7 @@ const cards = [
     icon: Car,
     features: ["Innova, Tempo & sedans", "Experienced Kashmiri drivers", "Flexible day-wise itinerary"],
     cta: "Book Car",
-    bg: "linear-gradient(135deg, var(--emerald-deep), var(--emerald-brand))",
+    bg: "linear-gradient(135deg, #0A1F44, #4A90C4)",
     from: 60,
   },
 ];

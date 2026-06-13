@@ -1,20 +1,42 @@
-export const ADMIN_EMAIL = "admin@talibs.com";
-export const ADMIN_PASSWORD = "Talib@2024";
-export const AUTH_KEY = "talibs_admin_auth";
+import { supabase } from "@/lib/supabase";
 
-export function isAdminLoggedIn(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(AUTH_KEY) === "1";
-}
-
-export function loginAdmin(email: string, password: string): boolean {
-  if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-    window.localStorage.setItem(AUTH_KEY, "1");
-    return true;
+/**
+ * Sign in using Supabase Auth (email + password).
+ * Returns true on success, false on failure.
+ */
+export async function loginAdmin(email: string, password: string): Promise<boolean> {
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    console.error("loginAdmin:", error.message);
+    return false;
   }
-  return false;
+  return true;
 }
 
-export function logoutAdmin() {
-  window.localStorage.removeItem(AUTH_KEY);
+/**
+ * Sign out the current admin session.
+ */
+export async function logoutAdmin(): Promise<void> {
+  await supabase.auth.signOut();
+}
+
+/**
+ * Check if there is an active authenticated session.
+ * NOTE: this is async because it checks the Supabase session.
+ */
+export async function isAdminLoggedIn(): Promise<boolean> {
+  const { data } = await supabase.auth.getSession();
+  return !!data.session;
+}
+
+/**
+ * Subscribe to auth state changes. Call the returned unsubscribe fn on cleanup.
+ */
+export function onAuthChange(
+  callback: (loggedIn: boolean) => void
+): () => void {
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    callback(!!session);
+  });
+  return () => data.subscription.unsubscribe();
 }

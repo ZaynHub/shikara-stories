@@ -24,7 +24,7 @@ export default function Hero() {
       {/* ZONE 1 — top content */}
       <div
         className="relative z-10 flex flex-col items-start text-left"
-        style={{ padding: "100px 24px 0", maxWidth: "100%" }}
+        style={{ padding: "148px 24px 0", maxWidth: "100%" }}
       >
         <motion.span
           initial={{ opacity: 0, y: -10 }}

@@ -15,7 +15,7 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
 };
 
-function FeatureCard({ icon, title, desc, accent, delay }: { icon: string; title: string; desc: string; accent: "gold" | "emerald"; delay: number }) {
+function FeatureCard({ icon, title, desc, accent, delay }: { icon: string; title: string; desc: string; accent: "gold" | "kashmir"; delay: number }) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -47,7 +47,7 @@ function FeatureCard({ icon, title, desc, accent, delay }: { icon: string; title
       >
         <div
           className={`w-16 h-16 rounded-full grid place-items-center text-3xl mb-5 ${
-            accent === "gold" ? "bg-gold/15" : "bg-emerald-brand/10"
+            accent === "gold" ? "bg-gold/15" : "bg-[#4A90C4]/10"
           }`}
         >
           <span>{icon}</span>
@@ -77,7 +77,7 @@ export default function WhyChooseUs() {
               icon={f.icon}
               title={f.title}
               desc={f.desc}
-              accent={i % 2 === 0 ? "gold" : "emerald"}
+              accent={i % 2 === 0 ? "gold" : "kashmir"}
               delay={(i % 3) * 0.1}
             />
           ))}

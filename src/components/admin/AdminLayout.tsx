@@ -6,12 +6,12 @@ import logo from "@/assets/talib-logo.png.asset.json";
 import { isAdminLoggedIn, logoutAdmin } from "@/lib/admin-auth";
 
 const NAV = [
-  { to: "/admin/dashboard", label: "Overview", icon: Package, emoji: "📊" },
-  { to: "/admin/packages", label: "Packages", icon: Package, emoji: "📦" },
-  { to: "/admin/offers", label: "Offers", icon: Tag, emoji: "🏷️" },
-  { to: "/admin/gallery-manager", label: "Gallery", icon: ImageIcon, emoji: "🖼️" },
-  { to: "/admin/enquiries", label: "Enquiries", icon: Inbox, emoji: "📩" },
-  { to: "/admin/settings", label: "Settings", icon: Settings, emoji: "⚙️" },
+  { to: "/admin/dashboard", label: "Overview",  emoji: "📊" },
+  { to: "/admin/packages",  label: "Packages",  emoji: "📦" },
+  { to: "/admin/offers",    label: "Offers",    emoji: "🏷️" },
+  { to: "/admin/gallery-manager", label: "Gallery", emoji: "🖼️" },
+  { to: "/admin/enquiries", label: "Enquiries", emoji: "📩" },
+  { to: "/admin/settings",  label: "Settings",  emoji: "⚙️" },
 ] as const;
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -20,20 +20,31 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) {
-      navigate({ to: "/admin" });
-    } else {
-      setReady(true);
-    }
+    isAdminLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        navigate({ to: "/admin" });
+      } else {
+        setReady(true);
+      }
+    });
   }, [navigate]);
 
-  const onLogout = () => {
-    logoutAdmin();
+  const onLogout = async () => {
+    await logoutAdmin();
     toast.success("Logged out");
     navigate({ to: "/admin" });
   };
 
-  if (!ready) return null;
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F6F7FB" }}>
+        <div className="text-center">
+          <div className="w-10 h-10 rounded-full border-4 border-[#C9A84C] border-t-transparent animate-spin mx-auto" />
+          <p className="mt-3 text-sm text-gray-500">Loading admin…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F7FB] flex">

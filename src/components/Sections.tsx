@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Mountain, Heart, Anchor, Car, Camera, Compass, Star, Quote } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,12 +16,7 @@ const packages = [
   { icon: Camera, title: "Photography Tours", desc: "Catch the golden chinars & Himalayan sunrises with us.", price: "₹16,800", days: "4N / 5D" },
 ];
 
-const destinations = [
-  { name: "Gulmarg", tag: "Meadow of Flowers", hue: "from-emerald-brand to-kashmir-blue" },
-  { name: "Pahalgam", tag: "Valley of Shepherds", hue: "from-kashmir-blue to-navy" },
-  { name: "Sonmarg", tag: "Meadow of Gold", hue: "from-gold to-emerald-brand" },
-  { name: "Dal Lake", tag: "Jewel of Srinagar", hue: "from-kashmir-blue to-emerald-brand" },
-];
+
 
 const testimonials = [
   { name: "Priya & Arjun", role: "Honeymoon · Mumbai", text: "Talib designed a fairytale week — Shikara dinners, snow at Gulmarg, every detail flawless." },
@@ -40,7 +36,7 @@ export default function Sections() {
           viewport={{ once: true, amount: 0.3 }}
           className="max-w-2xl mb-14"
         >
-          <span className="text-xs tracking-[0.25em] uppercase text-emerald-brand font-semibold">Curated Packages</span>
+          <span className="text-xs tracking-[0.25em] uppercase text-[#C9A84C] font-semibold">Curated Packages</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 text-charcoal">
             Journeys crafted across <span className="text-gradient-brand">Kashmir</span>.
           </h2>
@@ -70,7 +66,7 @@ export default function Sections() {
                 <div className="mt-6 flex items-end justify-between border-t border-border pt-4">
                   <div>
                     <div className="text-xs text-muted-foreground">Starting at</div>
-                    <div className="font-display text-2xl text-emerald-brand font-bold">{p.price}</div>
+                    <div className="font-display text-2xl text-[#C9A84C] font-bold">{p.price}</div>
                   </div>
                   <span className="text-xs px-3 py-1 rounded-full bg-cream text-charcoal/70 font-medium">{p.days}</span>
                 </div>
@@ -80,46 +76,11 @@ export default function Sections() {
         </div>
       </section>
 
-      {/* Destinations strip */}
-      <section className="bg-cream py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="flex flex-wrap items-end justify-between gap-6 mb-12"
-          >
-            <div className="max-w-xl">
-              <span className="text-xs tracking-[0.25em] uppercase text-emerald-brand font-semibold">Destinations</span>
-              <h2 className="font-display text-4xl md:text-5xl mt-3 text-charcoal">
-                Postcards from <span className="text-gradient-brand">Paradise</span>.
-              </h2>
-            </div>
-            <a href="#" className="text-sm font-semibold text-emerald-brand hover:text-gold transition-colors">View all destinations →</a>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {destinations.map((d, i) => (
-              <motion.div
-                key={d.name}
-                variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className={`tilt-card relative h-72 rounded-2xl overflow-hidden bg-gradient-to-br ${d.hue} text-white p-6 flex flex-col justify-end`}
-              >
-                <div className="absolute inset-0 opacity-30"
-                  style={{ backgroundImage: "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.5), transparent 50%)" }} />
-                <div className="relative">
-                  <div className="text-xs tracking-[0.2em] uppercase text-white/80">{d.tag}</div>
-                  <div className="font-display text-3xl mt-1">{d.name}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-6 py-24">
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs tracking-[0.25em] uppercase text-emerald-brand font-semibold">Loved by travelers</span>
+          <span className="text-xs tracking-[0.25em] uppercase text-[#C9A84C] font-semibold">Loved by travelers</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 text-charcoal">
             Stories from <span className="text-gradient-brand">the valley</span>.
           </h2>
@@ -169,12 +130,12 @@ export default function Sections() {
                   Tell us your dates and dreams. We'll design a Kashmir journey that's truly yours.
                 </p>
               </div>
-              <a
-                href="#contact"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-emerald-brand font-bold btn-3d hover:-translate-y-1 transition-transform whitespace-nowrap"
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-[#C9A84C] font-bold btn-3d hover:-translate-y-1 transition-transform whitespace-nowrap"
               >
                 Plan My Trip →
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>

@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Check, X, MessageCircle, Loader2 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import PageHero from "@/components/PageHero";
+import {
+  loadPackages, loadSettings, DEFAULT_SETTINGS,
+  type AdminPackage, type PackageType,
+} from "@/lib/admin-data";
 
 export const Route = createFileRoute("/kashmir-tours")({
   head: () => ({
@@ -15,212 +19,208 @@ export const Route = createFileRoute("/kashmir-tours")({
   component: KashmirToursPage,
 });
 
-type Category = "Honeymoon" | "Family" | "Adventure" | "Pilgrimage" | "Budget" | "Luxury";
-
-interface Pkg {
-  id: number;
-  name: string;
-  category: Category;
-  duration: string;
-  price: string;
-  hue: string;
-  itinerary: { day: string; title: string; details: string }[];
-  inclusions: string[];
-  exclusions: string[];
-}
-
-const packages: Pkg[] = [
-  { id: 1, name: "Kashmir Classic", category: "Family", duration: "5D / 4N", price: "₹12,999", hue: "from-kashmir-blue to-emerald-brand",
-    itinerary: [
-      { day: "Day 1", title: "Arrive Srinagar", details: "Airport pickup, Shikara ride on Dal Lake, houseboat check-in." },
-      { day: "Day 2", title: "Gulmarg Excursion", details: "Gondola ride, snow activities, return to Srinagar." },
-      { day: "Day 3", title: "Pahalgam Day", details: "Aru, Betaab & Chandanwari valleys." },
-      { day: "Day 4", title: "Srinagar Sightseeing", details: "Mughal gardens, local markets, Hazratbal." },
-      { day: "Day 5", title: "Departure", details: "Airport drop with sweet memories." },
-    ],
-    inclusions: ["Accommodation in deluxe hotels & houseboat", "All transfers in private cab", "Daily breakfast & dinner", "All sightseeing as per itinerary", "Permits & taxes"],
-    exclusions: ["Airfare", "Personal expenses", "Pony / sledge rides", "Lunch", "Travel insurance"] },
-  { id: 2, name: "Romantic Honeymoon", category: "Honeymoon", duration: "6D / 5N", price: "₹18,999", hue: "from-pink-500 to-gold",
-    itinerary: [
-      { day: "Day 1", title: "Welcome to Paradise", details: "Royal houseboat suite, candle-lit dinner." },
-      { day: "Day 2", title: "Gulmarg Romance", details: "Gondola Phase 1 & 2, snow play." },
-      { day: "Day 3", title: "Pahalgam Bliss", details: "Riverside lunch, private walks." },
-      { day: "Day 4", title: "Sonamarg Snow", details: "Thajiwas glacier visit." },
-      { day: "Day 5", title: "Shikara Sunset", details: "Floating market & Mughal gardens." },
-      { day: "Day 6", title: "Sweet Goodbye", details: "Airport transfer." },
-    ],
-    inclusions: ["Luxury houseboat suite", "Candle-lit dinner", "Private cab", "Flower decoration", "Daily breakfast & dinner"],
-    exclusions: ["Airfare", "Lunch", "Personal expenses", "Spa & extra activities"] },
-  { id: 3, name: "Adventure Trek", category: "Adventure", duration: "7D / 6N", price: "₹15,999", hue: "from-emerald-brand to-emerald-deep",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar Arrival", details: "Briefing & gear check." },
-      { day: "Day 2", title: "Drive to Aru", details: "Acclimatisation walk." },
-      { day: "Day 3-5", title: "Tarsar Marsar Trek", details: "Camping under alpine stars." },
-      { day: "Day 6", title: "Return to Srinagar", details: "Rest & celebration dinner." },
-      { day: "Day 7", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Certified trek leader", "Camping equipment", "All meals on trek", "Permits", "First-aid"],
-    exclusions: ["Personal gear", "Airfare", "Insurance"] },
-  { id: 4, name: "Family Special", category: "Family", duration: "5D / 4N", price: "₹10,999", hue: "from-gold to-emerald-brand",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar Arrival", details: "Houseboat check-in." },
-      { day: "Day 2", title: "Gulmarg Fun", details: "Gondola ride for the whole family." },
-      { day: "Day 3", title: "Pahalgam Picnic", details: "Family-friendly valleys." },
-      { day: "Day 4", title: "Mughal Gardens", details: "Shalimar, Nishat, Chashma Shahi." },
-      { day: "Day 5", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Kid-friendly hotels", "Private cab", "Breakfast & dinner", "All sightseeing"],
-    exclusions: ["Airfare", "Lunch", "Pony rides"] },
-  { id: 5, name: "Pilgrimage Tour", category: "Pilgrimage", duration: "4D / 3N", price: "₹8,999", hue: "from-kashmir-blue to-navy",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar Arrival", details: "Hazratbal Shrine darshan." },
-      { day: "Day 2", title: "Shankaracharya Temple", details: "Charar-e-Sharief visit." },
-      { day: "Day 3", title: "Local Shrines", details: "Guided spiritual tour." },
-      { day: "Day 4", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["3-star hotel stay", "Private cab", "Breakfast & dinner", "Spiritual guide"],
-    exclusions: ["Airfare", "Donations", "Lunch"] },
-  { id: 6, name: "Budget Getaway", category: "Budget", duration: "3D / 2N", price: "₹6,999", hue: "from-emerald-deep to-kashmir-blue",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar Arrival", details: "Budget hotel check-in, Shikara ride." },
-      { day: "Day 2", title: "Local Sightseeing", details: "Mughal gardens & markets." },
-      { day: "Day 3", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Budget hotel", "Breakfast", "Cab transfers", "Shikara ride"],
-    exclusions: ["Airfare", "Dinner", "Personal expenses"] },
-  { id: 7, name: "Luxury Kashmir", category: "Luxury", duration: "7D / 6N", price: "₹39,999", hue: "from-gold to-navy",
-    itinerary: [
-      { day: "Day 1", title: "5★ Welcome", details: "Royal suite & welcome dinner." },
-      { day: "Day 2", title: "Gulmarg Private", details: "Private gondola booking." },
-      { day: "Day 3", title: "Heritage Houseboat", details: "Premier houseboat stay." },
-      { day: "Day 4", title: "Pahalgam Retreat", details: "Luxury resort stay." },
-      { day: "Day 5", title: "Sonamarg Glacier", details: "Private guide & lunch." },
-      { day: "Day 6", title: "Srinagar Leisure", details: "Spa & shopping." },
-      { day: "Day 7", title: "Royal Farewell", details: "Airport drop in luxury sedan." },
-    ],
-    inclusions: ["5-star luxury hotels", "Luxury sedan", "All meals", "Private guide", "Spa session"],
-    exclusions: ["Airfare", "Alcohol", "Personal shopping"] },
-  { id: 8, name: "Snow Magic", category: "Adventure", duration: "5D / 4N", price: "₹14,499", hue: "from-kashmir-blue to-white",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar Arrival", details: "Brief & rest." },
-      { day: "Day 2-3", title: "Gulmarg Skiing", details: "Ski lessons & gondola." },
-      { day: "Day 4", title: "Sonamarg", details: "Glacier trek." },
-      { day: "Day 5", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Ski gear", "Instructor", "Hotel stay", "Breakfast & dinner"],
-    exclusions: ["Airfare", "Lunch", "Insurance"] },
-  { id: 9, name: "Couples Escape", category: "Honeymoon", duration: "5D / 4N", price: "₹16,999", hue: "from-pink-500 to-kashmir-blue",
-    itinerary: [
-      { day: "Day 1", title: "Welcome", details: "Houseboat & dinner." },
-      { day: "Day 2", title: "Gulmarg", details: "Gondola romance." },
-      { day: "Day 3", title: "Pahalgam", details: "Riverside time." },
-      { day: "Day 4", title: "Srinagar", details: "Mughal gardens." },
-      { day: "Day 5", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Deluxe houseboat", "Cab", "Breakfast & dinner", "Flower decor"],
-    exclusions: ["Airfare", "Lunch", "Personal expenses"] },
-  { id: 10, name: "Group Backpacker", category: "Budget", duration: "4D / 3N", price: "₹7,499", hue: "from-emerald-brand to-gold",
-    itinerary: [
-      { day: "Day 1", title: "Arrival", details: "Hostel check-in." },
-      { day: "Day 2", title: "Sightseeing", details: "Srinagar tour." },
-      { day: "Day 3", title: "Gulmarg", details: "Day trip." },
-      { day: "Day 4", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Hostel dorms", "Shared transport", "Breakfast"],
-    exclusions: ["Airfare", "Lunch & dinner", "Personal expenses"] },
-  { id: 11, name: "Char Dham Yatra", category: "Pilgrimage", duration: "6D / 5N", price: "₹12,499", hue: "from-navy to-gold",
-    itinerary: [
-      { day: "Day 1", title: "Srinagar", details: "Hazratbal darshan." },
-      { day: "Day 2", title: "Shankaracharya", details: "Temple visit." },
-      { day: "Day 3", title: "Amarnath base", details: "Travel & rest." },
-      { day: "Day 4", title: "Yatra", details: "Darshan." },
-      { day: "Day 5", title: "Return", details: "Back to Srinagar." },
-      { day: "Day 6", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Hotel stay", "Cab", "Guide", "Meals"],
-    exclusions: ["Airfare", "Donations", "Insurance"] },
-  { id: 12, name: "Royal Houseboat Week", category: "Luxury", duration: "6D / 5N", price: "₹28,999", hue: "from-gold to-emerald-deep",
-    itinerary: [
-      { day: "Day 1", title: "Royal Welcome", details: "Heritage houseboat." },
-      { day: "Day 2", title: "Floating Market", details: "Sunrise shikara." },
-      { day: "Day 3", title: "Gulmarg", details: "Gondola ride." },
-      { day: "Day 4", title: "Pahalgam", details: "Resort stay." },
-      { day: "Day 5", title: "Srinagar", details: "Gardens & shopping." },
-      { day: "Day 6", title: "Departure", details: "Airport drop." },
-    ],
-    inclusions: ["Heritage houseboat", "Luxury sedan", "All meals", "Spa session"],
-    exclusions: ["Airfare", "Alcohol", "Personal shopping"] },
+// Static fallback packages — shown if no packages in DB yet
+const FALLBACK_PACKAGES: AdminPackage[] = [
+  {
+    id: "seed-1", name: "Kashmir Classic", type: "Family", price: 12999, duration: "5D / 4N",
+    shortDescription: "The perfect family escape through Kashmir's most iconic destinations.",
+    itinerary: "Day 1: Arrive Srinagar, Shikara ride, Houseboat check-in\nDay 2: Gulmarg Gondola & snow activities\nDay 3: Pahalgam — Aru, Betaab & Chandanwari valleys\nDay 4: Srinagar — Mughal gardens, local markets, Hazratbal\nDay 5: Airport drop with sweet memories",
+    inclusions: "Accommodation in deluxe hotels & houseboat\nAll transfers in private cab\nDaily breakfast & dinner\nAll sightseeing as per itinerary\nPermits & taxes",
+    exclusions: "Airfare\nPersonal expenses\nPony / sledge rides\nLunch\nTravel insurance",
+    image: "", active: true, bestSeller: true, createdAt: 1,
+  },
+  {
+    id: "seed-2", name: "Romantic Honeymoon", type: "Honeymoon", price: 18999, duration: "6D / 5N",
+    shortDescription: "A magical honeymoon crafted for two in paradise.",
+    itinerary: "Day 1: Royal houseboat suite, candle-lit dinner\nDay 2: Gulmarg Gondola Phase 1 & 2\nDay 3: Pahalgam — riverside walks\nDay 4: Sonamarg — Thajiwas glacier\nDay 5: Floating market & Mughal gardens\nDay 6: Airport transfer",
+    inclusions: "Luxury houseboat suite\nCandle-lit dinner\nPrivate cab\nFlower decoration\nDaily breakfast & dinner",
+    exclusions: "Airfare\nLunch\nPersonal expenses\nSpa & extra activities",
+    image: "", active: true, bestSeller: false, createdAt: 2,
+  },
+  {
+    id: "seed-3", name: "Adventure Trek", type: "Adventure", price: 15999, duration: "7D / 6N",
+    shortDescription: "Trek through breathtaking Himalayan trails and camp under stars.",
+    itinerary: "Day 1: Srinagar arrival — briefing & gear check\nDay 2: Drive to Aru — acclimatisation walk\nDay 3-5: Tarsar Marsar Trek — camping under alpine stars\nDay 6: Return to Srinagar — rest & celebration dinner\nDay 7: Airport drop",
+    inclusions: "Certified trek leader\nCamping equipment\nAll meals on trek\nPermits\nFirst-aid",
+    exclusions: "Personal gear\nAirfare\nInsurance",
+    image: "", active: true, bestSeller: false, createdAt: 3,
+  },
+  {
+    id: "seed-4", name: "Family Special", type: "Family", price: 10999, duration: "5D / 4N",
+    shortDescription: "Kid-friendly itinerary packed with fun and memories.",
+    itinerary: "Day 1: Srinagar arrival — houseboat check-in\nDay 2: Gulmarg Gondola for the whole family\nDay 3: Pahalgam family picnic in kid-friendly valleys\nDay 4: Mughal Gardens — Shalimar, Nishat, Chashma Shahi\nDay 5: Airport drop",
+    inclusions: "Kid-friendly hotels\nPrivate cab\nBreakfast & dinner\nAll sightseeing",
+    exclusions: "Airfare\nLunch\nPony rides",
+    image: "", active: true, bestSeller: false, createdAt: 4,
+  },
+  {
+    id: "seed-5", name: "Pilgrimage Tour", type: "Pilgrimage", price: 8999, duration: "4D / 3N",
+    shortDescription: "A spiritually enriching tour of Kashmir's sacred sites.",
+    itinerary: "Day 1: Srinagar arrival — Hazratbal Shrine darshan\nDay 2: Shankaracharya Temple & Charar-e-Sharief\nDay 3: Local shrines — guided spiritual tour\nDay 4: Airport drop",
+    inclusions: "3-star hotel stay\nPrivate cab\nBreakfast & dinner\nSpiritual guide",
+    exclusions: "Airfare\nDonations\nLunch",
+    image: "", active: true, bestSeller: false, createdAt: 5,
+  },
+  {
+    id: "seed-6", name: "Budget Getaway", type: "Budget", price: 6999, duration: "3D / 2N",
+    shortDescription: "See the best of Srinagar without breaking the bank.",
+    itinerary: "Day 1: Srinagar arrival — budget hotel check-in, Shikara ride\nDay 2: Mughal gardens & local markets\nDay 3: Airport drop",
+    inclusions: "Budget hotel\nBreakfast\nCab transfers\nShikara ride",
+    exclusions: "Airfare\nDinner\nPersonal expenses",
+    image: "", active: true, bestSeller: false, createdAt: 6,
+  },
+  {
+    id: "seed-7", name: "Luxury Kashmir", type: "Luxury", price: 39999, duration: "7D / 6N",
+    shortDescription: "The finest 5-star Kashmir experience, end to end.",
+    itinerary: "Day 1: 5★ welcome — royal suite & welcome dinner\nDay 2: Gulmarg — private gondola booking\nDay 3: Heritage houseboat premier suite\nDay 4: Pahalgam luxury resort\nDay 5: Sonamarg — private guide & gourmet lunch\nDay 6: Srinagar — spa & shopping\nDay 7: Royal farewell — airport in luxury sedan",
+    inclusions: "5-star luxury hotels\nLuxury sedan\nAll meals\nPrivate guide\nSpa session",
+    exclusions: "Airfare\nAlcohol\nPersonal shopping",
+    image: "", active: true, bestSeller: false, createdAt: 7,
+  },
 ];
 
-const filters = ["All", "Honeymoon", "Family", "Adventure", "Pilgrimage", "Budget", "Luxury"] as const;
+const HUE_MAP: Record<PackageType, string> = {
+  Honeymoon:  "from-pink-400 to-[#C9A84C]",
+  Family:     "from-[#4A90C4] to-[#0A1F44]",
+  Adventure:  "from-[#2D6A4F] to-[#0A1F44]",
+  Pilgrimage: "from-[#C9A84C] to-[#0A1F44]",
+  Budget:     "from-[#0A1F44] to-[#4A90C4]",
+  Luxury:     "from-[#C9A84C] to-[#7C3AED]",
+};
+
+const FILTERS = ["All", "Honeymoon", "Family", "Adventure", "Pilgrimage", "Budget", "Luxury"] as const;
+type Filter = (typeof FILTERS)[number];
+
+function parseLines(text: string) {
+  return text.split("\n").map((l) => l.replace(/^[-•*]\s*/, "").trim()).filter(Boolean);
+}
+function parseItinerary(text: string) {
+  return text.split("\n").map((l, i) => {
+    const m = l.match(/^(Day\s+[\d\-]+):\s*(.+)$/i);
+    if (m) return { day: m[1], title: m[2] };
+    return { day: `Day ${i + 1}`, title: l };
+  }).filter((x) => x.title.trim());
+}
 
 function KashmirToursPage() {
-  const [filter, setFilter] = useState<(typeof filters)[number]>("All");
-  const [selected, setSelected] = useState<Pkg | null>(null);
-  const visible = filter === "All" ? packages : packages.filter((p) => p.category === filter);
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
+  const [filter, setFilter] = useState<Filter>("All");
+  const [selected, setSelected] = useState<AdminPackage | null>(null);
+  const [whatsapp, setWhatsapp] = useState(DEFAULT_SETTINGS.whatsapp);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([loadPackages(), loadSettings()]).then(([pkgs, settings]) => {
+      const active = pkgs.filter((p) => p.active);
+      setPackages(active.length > 0 ? active : FALLBACK_PACKAGES);
+      setWhatsapp(settings.whatsapp);
+      setLoading(false);
+    });
+  }, []);
+
+  const visible = filter === "All" ? packages : packages.filter((p) => p.type === filter);
+
+  // Keep modal closed when filter changes
+  useEffect(() => setSelected(null), [filter]);
 
   return (
     <PageShell>
       <PageHero title="Kashmir Tour Packages" subtitle="Pick a journey crafted for your dreams" />
 
       <section className="max-w-7xl mx-auto px-6 py-16">
+        {/* Filter tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {filters.map((f) => (
+          {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                filter === f ? "bg-gradient-brand text-white shadow-lg" : "bg-white border border-border text-charcoal hover:border-emerald-brand"
-              }`}
+              className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300"
+              style={
+                filter === f
+                  ? { background: "#0A1F44", color: "#fff" }
+                  : { background: "#fff", border: "1px solid #e5e7eb", color: "#374151" }
+              }
             >
               {f}
             </button>
           ))}
         </div>
 
-        <div key={filter} className="grid md:grid-cols-2 lg:grid-cols-3 gap-7 animate-fade-in">
-          {visible.map((p, i) => (
-            <motion.article
-              key={p.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ delay: i * 0.06, duration: 0.5 }}
-              className="tilt-card group rounded-2xl bg-white border border-border overflow-hidden flex flex-col shadow-sm hover:shadow-2xl transition-shadow duration-500"
-            >
-              <div className={`relative h-44 bg-gradient-to-br ${p.hue}`}>
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-gold text-charcoal text-xs font-bold shadow">{p.category}</span>
+        {loading ? (
+          <div className="flex items-center justify-center py-24 gap-3 text-gray-400">
+            <Loader2 className="w-6 h-6 animate-spin" /> Loading packages…
+          </div>
+        ) : (
+          <>
+            {visible.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-lg text-gray-500 font-semibold">No {filter} packages currently active</p>
+                <p className="text-sm text-gray-400 mt-1">Check back soon or pick another category.</p>
               </div>
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="font-display text-2xl text-charcoal">{p.name}</h3>
-                <div className="text-xs text-muted-foreground mt-1">{p.duration}</div>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="font-display text-3xl text-emerald-brand font-bold">{p.price}</span>
-                  <span className="text-xs text-muted-foreground">/person</span>
-                </div>
-                <div className="mt-auto pt-6 flex gap-3">
-                  <button
-                    onClick={() => setSelected(p)}
-                    className="flex-1 px-4 py-2.5 rounded-full border-2 border-emerald-brand text-emerald-brand text-sm font-semibold hover:bg-emerald-brand hover:text-white transition-colors"
+            )}
+
+            <div key={filter} className="grid md:grid-cols-2 lg:grid-cols-3 gap-7 animate-fade-in">
+              {visible.map((p, i) => {
+                const hue = HUE_MAP[p.type] || "from-[#0A1F44] to-[#4A90C4]";
+                return (
+                  <motion.article
+                    key={p.id}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.15 }}
+                    transition={{ delay: i * 0.06, duration: 0.5 }}
+                    className="tilt-card group rounded-2xl bg-white border border-border overflow-hidden flex flex-col shadow-sm hover:shadow-2xl transition-shadow duration-500"
                   >
-                    View Details
-                  </button>
-                  <button className="flex-1 px-4 py-2.5 rounded-full bg-gold text-charcoal text-sm font-bold btn-3d hover:-translate-y-0.5 transition-transform">
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
+                    <div className={`relative h-44 bg-gradient-to-br ${hue}`}>
+                      {p.image && <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />}
+                      <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-gold text-charcoal text-xs font-bold shadow">{p.type}</span>
+                      {p.bestSeller && (
+                        <span className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: "#C9A84C", color: "#0A1F44" }}>
+                          ⭐ Best Seller
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="font-display text-2xl text-charcoal">{p.name}</h3>
+                      <div className="text-xs text-muted-foreground mt-1">{p.duration}</div>
+                      {p.shortDescription && (
+                        <p className="text-sm text-charcoal/70 mt-2 line-clamp-2">{p.shortDescription}</p>
+                      )}
+                      <div className="mt-3 flex items-baseline gap-1">
+                        <span className="font-display text-3xl font-bold" style={{ color: "#C9A84C" }}>₹{p.price.toLocaleString("en-IN")}</span>
+                        <span className="text-xs text-muted-foreground">/person</span>
+                      </div>
+                      <div className="mt-auto pt-5 flex gap-3">
+                        <button
+                          onClick={() => setSelected(p)}
+                          className="flex-1 px-4 py-2.5 rounded-full border-2 text-sm font-semibold transition-colors hover:bg-[#0A1F44] hover:text-white"
+                          style={{ borderColor: "#0A1F44", color: "#0A1F44" }}
+                        >
+                          View Details
+                        </button>
+                        <a
+                          href={`https://wa.me/${whatsapp}?text=I want to book the ${encodeURIComponent(p.name)} package!`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex-1 px-4 py-2.5 rounded-full text-sm font-bold btn-3d hover:-translate-y-0.5 transition-transform text-center"
+                          style={{ background: "#C9A84C", color: "#0A1F44" }}
+                        >
+                          Book Now
+                        </a>
+                      </div>
+                    </div>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </>
+        )}
       </section>
 
+      {/* Detail modal */}
       <AnimatePresence>
         {selected && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-navy/80 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setSelected(null)}
           >
@@ -232,7 +232,8 @@ function KashmirToursPage() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             >
-              <div className={`relative h-40 bg-gradient-to-br ${selected.hue} rounded-t-3xl`}>
+              <div className={`relative h-44 bg-gradient-to-br ${HUE_MAP[selected.type] || "from-[#0A1F44] to-[#4A90C4]"} rounded-t-3xl`}>
+                {selected.image && <img src={selected.image} alt={selected.name} className="absolute inset-0 w-full h-full object-cover rounded-t-3xl" />}
                 <button
                   onClick={() => setSelected(null)}
                   className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center hover:bg-white shadow"
@@ -240,50 +241,69 @@ function KashmirToursPage() {
                   <X className="w-5 h-5 text-charcoal" />
                 </button>
                 <div className="absolute bottom-4 left-6 text-white">
-                  <span className="px-3 py-1 rounded-full bg-gold text-charcoal text-xs font-bold">{selected.category}</span>
+                  <span className="px-3 py-1 rounded-full bg-gold text-charcoal text-xs font-bold">{selected.type}</span>
                   <h3 className="font-display text-3xl font-bold mt-2">{selected.name}</h3>
-                  <p className="text-sm opacity-90">{selected.duration} · {selected.price} /person</p>
+                  <p className="text-sm opacity-90">{selected.duration} · ₹{selected.price.toLocaleString("en-IN")} /person</p>
                 </div>
               </div>
 
               <div className="p-6 md:p-8 space-y-7">
-                <div>
-                  <h4 className="font-display text-xl text-navy font-bold mb-3">Day-wise Itinerary</h4>
-                  <ol className="space-y-3">
-                    {selected.itinerary.map((d) => (
-                      <li key={d.day} className="flex gap-4 p-4 rounded-xl bg-cream border border-border">
-                        <div className="font-bold text-emerald-brand min-w-[70px]">{d.day}</div>
-                        <div>
-                          <div className="font-semibold text-charcoal">{d.title}</div>
-                          <div className="text-sm text-muted-foreground">{d.details}</div>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+                {selected.shortDescription && (
+                  <p className="text-muted-foreground">{selected.shortDescription}</p>
+                )}
 
+                {/* Itinerary */}
+                {selected.itinerary && (
+                  <div>
+                    <h4 className="font-display text-xl text-navy font-bold mb-3">🗺️ Day-wise Itinerary</h4>
+                    <ol className="space-y-2">
+                      {parseItinerary(selected.itinerary).map((d, i) => (
+                        <li key={i} className="flex gap-4 p-3.5 rounded-xl bg-[#F0F4FF] border border-[#E0E7FF]">
+                          <div className="font-bold min-w-[70px] text-sm" style={{ color: "#C9A84C" }}>{d.day}</div>
+                          <div className="text-sm text-charcoal">{d.title}</div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                {/* Inclusions & Exclusions */}
                 <div className="grid md:grid-cols-2 gap-5">
-                  <div>
-                    <h4 className="font-display text-lg text-navy font-bold mb-3">Inclusions</h4>
-                    <ul className="space-y-2">
-                      {selected.inclusions.map((x) => (
-                        <li key={x} className="flex gap-2 text-sm"><Check className="w-4 h-4 mt-0.5 text-emerald-brand" /> {x}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-display text-lg text-navy font-bold mb-3">Exclusions</h4>
-                    <ul className="space-y-2">
-                      {selected.exclusions.map((x) => (
-                        <li key={x} className="flex gap-2 text-sm"><X className="w-4 h-4 mt-0.5 text-red-500" /> {x}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  {selected.inclusions && (
+                    <div>
+                      <h4 className="font-display text-lg text-navy font-bold mb-3">✅ Inclusions</h4>
+                      <ul className="space-y-1.5">
+                        {parseLines(selected.inclusions).map((x) => (
+                          <li key={x} className="flex gap-2 text-sm">
+                            <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#C9A84C" }} /> {x}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {selected.exclusions && (
+                    <div>
+                      <h4 className="font-display text-lg text-navy font-bold mb-3">❌ Exclusions</h4>
+                      <ul className="space-y-1.5">
+                        {parseLines(selected.exclusions).map((x) => (
+                          <li key={x} className="flex gap-2 text-sm">
+                            <X className="w-4 h-4 mt-0.5 shrink-0 text-red-400" /> {x}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
-                <button className="w-full py-4 rounded-full bg-gradient-brand text-white font-bold btn-3d hover:-translate-y-0.5 transition-transform">
-                  Book {selected.name} Now →
-                </button>
+                <a
+                  href={`https://wa.me/${whatsapp}?text=I want to book the ${encodeURIComponent(selected.name)} package (${selected.duration}, ₹${selected.price.toLocaleString("en-IN")}/person)`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-full text-white font-bold btn-3d hover:-translate-y-0.5 transition-transform"
+                  style={{ background: "#0A1F44" }}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Book {selected.name} via WhatsApp →
+                </a>
               </div>
             </motion.div>
           </motion.div>

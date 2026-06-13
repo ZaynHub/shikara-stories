@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Flame, MessageCircle } from "lucide-react";
+import { loadOffers, loadSettings, DEFAULT_SETTINGS, type AdminOffer } from "@/lib/admin-data";
 
-const TARGET = new Date("2026-06-30T23:59:59").getTime();
+const DEFAULT_TARGET = new Date("2026-06-30T23:59:59").getTime();
 
-function useCountdown() {
+function useCountdown(targetMs: number) {
   const [t, setT] = useState(0);
   useEffect(() => {
-    const tick = () => setT(Math.max(0, TARGET - Date.now()));
+    const tick = () => setT(Math.max(0, targetMs - Date.now()));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
-  const days = Math.floor(t / 86400000);
-  const hours = Math.floor((t % 86400000) / 3600000);
+  }, [targetMs]);
+  const days    = Math.floor(t / 86400000);
+  const hours   = Math.floor((t % 86400000) / 3600000);
   const minutes = Math.floor((t % 3600000) / 60000);
   const seconds = Math.floor((t % 60000) / 1000);
   return { days, hours, minutes, seconds };
@@ -31,17 +32,33 @@ function Box({ value, label }: { value: number; label: string }) {
 }
 
 export default function SpecialOffer() {
-  const { days, hours, minutes, seconds } = useCountdown();
+  const [offer, setOffer] = useState<AdminOffer | null>(null);
+  const [whatsapp, setWhatsapp] = useState(DEFAULT_SETTINGS.whatsapp);
+
+  useEffect(() => {
+    Promise.all([loadOffers(), loadSettings()]).then(([offers, settings]) => {
+      const active = offers.filter((o) => o.active);
+      if (active.length > 0) setOffer(active[0]);
+      setWhatsapp(settings.whatsapp);
+    });
+  }, []);
+
+  const targetMs = offer?.validUntil ? new Date(offer.validUntil).getTime() : DEFAULT_TARGET;
+  const { days, hours, minutes, seconds } = useCountdown(targetMs);
+
+  const title       = offer?.title       || "Summer Kashmir Special — Up to 30% Off!";
+  const description = offer?.description || "Book before 30th June 2026 and get exclusive discounts on tours, houseboats and honeymoon packages.";
+  const discount    = offer?.discount    || "30%";
 
   return (
-    <section className="relative py-20 overflow-hidden" style={{ background: "linear-gradient(120deg, var(--gold) 0%, var(--emerald-brand) 100%)" }}>
+    <section className="relative py-20 overflow-hidden" style={{ background: "linear-gradient(120deg, #C9A84C 0%, #0A1F44 100%)" }}>
       {/* floating particles */}
       <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: 24 }).map((_, i) => {
           const left = (i * 37) % 100;
-          const top = (i * 53) % 100;
-          const tx = ((i % 5) - 2) * 30 + "px";
-          const ty = -40 - (i % 4) * 20 + "px";
+          const top  = (i * 53) % 100;
+          const tx   = ((i % 5) - 2) * 30 + "px";
+          const ty   = -40 - (i % 4) * 20 + "px";
           const delay = (i * 0.3) % 6;
           return (
             <span
@@ -59,18 +76,16 @@ export default function SpecialOffer() {
         className="relative max-w-5xl mx-auto px-6 text-center text-white"
       >
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-sm font-semibold animate-pulse">
-          <Flame className="w-4 h-4" /> Limited Time Offer
+          <Flame className="w-4 h-4" /> Limited Time Offer — {discount} OFF
         </span>
         <h2 className="font-display text-4xl md:text-6xl mt-5 leading-tight">
-          Summer Kashmir Special — <span className="text-white drop-shadow">Up to 30% Off!</span>
+          {title}
         </h2>
-        <p className="mt-4 text-white/90 max-w-2xl mx-auto">
-          Book before 30th June 2026 and get exclusive discounts on tours, houseboats and honeymoon packages.
-        </p>
+        <p className="mt-4 text-white/90 max-w-2xl mx-auto">{description}</p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Box value={days} label="Days" />
-          <Box value={hours} label="Hours" />
+          <Box value={days}    label="Days" />
+          <Box value={hours}   label="Hours" />
           <Box value={minutes} label="Minutes" />
           <Box value={seconds} label="Seconds" />
         </div>
@@ -80,8 +95,9 @@ export default function SpecialOffer() {
             Grab This Deal
           </a>
           <a
-            href="https://wa.me/919999999999" target="_blank" rel="noreferrer"
-            className="px-7 py-3.5 rounded-full bg-[#25D366] text-white font-bold btn-3d hover:-translate-y-1 transition-transform inline-flex items-center gap-2"
+            href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer"
+            className="px-7 py-3.5 rounded-full font-bold btn-3d hover:-translate-y-1 transition-transform inline-flex items-center gap-2"
+            style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "2px solid rgba(255,255,255,0.5)" }}
           >
             <MessageCircle className="w-5 h-5" /> WhatsApp Us Now
           </a>

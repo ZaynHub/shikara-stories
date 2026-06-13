@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
+import { addEnquiry } from "@/lib/admin-data";
 
 const destinations = ["Srinagar", "Gulmarg", "Pahalgam", "Sonamarg", "Full Kashmir", "Custom"];
 const tripTypes = ["Honeymoon", "Family", "Adventure", "Pilgrimage", "Budget", "Luxury"];
@@ -19,16 +20,36 @@ export default function PlanTripForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1100));
+    const message = [
+      `From: ${form.from}`,
+      `Destination: ${form.destination}`,
+      `Date: ${form.date}`,
+      `Duration: ${form.days} days`,
+      `Trip Type: ${form.type}`,
+      form.notes ? `Notes: ${form.notes}` : "",
+    ].filter(Boolean).join("\n");
+
+    const result = await addEnquiry({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      message,
+      source: "plan-trip",
+    });
     setLoading(false);
-    toast.success("We'll contact you within 2 hours! 🎉");
-    setForm({ from: "", destination: "", date: "", days: "", type: "", name: "", email: "", phone: "", notes: "" });
+
+    if (result) {
+      toast.success("We'll contact you within 2 hours! 🎉");
+      setForm({ from: "", destination: "", date: "", days: "", type: "", name: "", email: "", phone: "", notes: "" });
+    } else {
+      toast.error("Something went wrong. Please try WhatsApp or call us directly.");
+    }
   };
 
-  const inputCls = "w-full h-12 px-4 rounded-xl border border-border bg-white/90 text-charcoal placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-brand/40 focus:border-emerald-brand transition";
+  const inputCls = "w-full h-12 px-4 rounded-xl border border-border bg-white/90 text-charcoal placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40 focus:border-[#C9A84C] transition";
 
   return (
-    <section id="plan-trip" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, var(--emerald-brand), var(--kashmir-blue))" }}>
+    <section id="plan-trip" className="relative py-24 overflow-hidden" style={{ background: "linear-gradient(135deg, #0A1F44, #4A90C4)" }}>
       <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white, transparent 40%), radial-gradient(circle at 80% 80%, var(--gold), transparent 40%)" }} />
       <div className="relative max-w-5xl mx-auto px-6">
         <motion.div

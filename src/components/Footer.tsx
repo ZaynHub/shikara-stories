@@ -1,6 +1,8 @@
 import { MessageCircle, MapPin, Phone, Mail } from "lucide-react";
 import type { SVGProps } from "react";
+import { useEffect, useState } from "react";
 import logo from "@/assets/talib-logo.png.asset.json";
+import { loadSettings, DEFAULT_SETTINGS, type SiteSettings } from "@/lib/admin-data";
 
 const Facebook = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...p}><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.9.3-1.6 1.6-1.6h1.6V4.2c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.6H7.6V14h2.7v8h3.2z"/></svg>
@@ -16,8 +18,11 @@ const quickLinks = ["Home", "About", "Tours", "Gallery", "Contact", "Blog"];
 const policies = ["Terms & Conditions", "Privacy Policy", "Refund Policy", "Payment Policy"];
 
 export default function Footer() {
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+  useEffect(() => { loadSettings().then(setSettings); }, []);
+
   return (
-    <footer className="relative bg-emerald-brand text-cream">
+    <footer className="relative text-cream" style={{ background: "#0A1F44" }}>
       <div
         className="absolute inset-0 opacity-[0.07] pointer-events-none"
         style={{
@@ -41,15 +46,24 @@ export default function Footer() {
             authentic hospitality since 2014.
           </p>
           <div className="flex items-center gap-3 mt-5">
-            {[Facebook, Instagram, MessageCircle, Youtube].map((Icon, i) => (
-              <a
-                key={i}
-                href="#"
-                className="w-9 h-9 grid place-items-center rounded-full bg-white/10 hover:bg-gold hover:text-charcoal text-white transition-all"
-              >
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
+            {[Facebook, Instagram, MessageCircle, Youtube].map((Icon, i) => {
+              let href = "#";
+              if (i === 0) href = settings.facebook;
+              if (i === 1) href = settings.instagram;
+              if (i === 2) href = `https://wa.me/${settings.whatsapp}`;
+              if (i === 3) href = settings.youtube;
+              
+              return (
+                <a
+                  key={i}
+                  href={href}
+                  target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 grid place-items-center rounded-full bg-white/10 hover:bg-gold hover:text-charcoal text-white transition-all"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              );
+            })}
           </div>
         </div>
 
@@ -77,30 +91,38 @@ export default function Footer() {
 
         <div>
           <h4 className="font-display text-lg text-white mb-5">Contact Us</h4>
-          <ul className="space-y-3 text-sm text-cream/85">
-            <li className="flex gap-3">
-              <MapPin className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-              Dal Lake Boulevard, Srinagar, Jammu &amp; Kashmir 190001
+          <ul className="space-y-4">
+            <li className="flex gap-3 items-start group">
+              <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+              <a href={settings.locationUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-cream/80 leading-relaxed hover:text-white transition-colors">
+                {settings.address}
+              </a>
             </li>
             <li className="flex gap-3">
               <Phone className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-              <a href="tel:+919999999999" className="hover:text-gold">+91 99999 99999</a>
+              <div className="flex flex-col gap-0.5">
+                <a href={`tel:${settings.phone.replace(/\s/g, "")}`} className="hover:text-gold">{settings.phone}</a>
+                {settings.phone2 && <a href={`tel:${settings.phone2.replace(/\s/g, "")}`} className="hover:text-gold opacity-80">{settings.phone2}</a>}
+                {settings.phone3 && <a href={`tel:${settings.phone3.replace(/\s/g, "")}`} className="hover:text-gold opacity-80">{settings.phone3}</a>}
+              </div>
             </li>
             <li className="flex gap-3">
               <Mail className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-              <a href="mailto:hello@talibstours.com" className="hover:text-gold">hello@talibstours.com</a>
+              <a href={`mailto:${settings.email}`} className="hover:text-gold break-all">{settings.email}</a>
             </li>
           </ul>
+
           <a
-            href="https://wa.me/919999999999"
-            className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] text-white font-semibold text-sm btn-3d hover:-translate-y-0.5 transition-transform"
+            href={`https://wa.me/${settings.whatsapp}`}
+            className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm btn-3d hover:-translate-y-0.5 transition-transform"
+            style={{ background: "#C9A84C", color: "#0A1F44" }}
           >
             <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
           </a>
         </div>
       </div>
 
-      <div className="relative bg-emerald-deep/60 border-t border-white/10">
+      <div className="relative border-t border-white/10" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="max-w-7xl mx-auto px-6 py-5 text-center text-xs text-cream/70">
           © {new Date().getFullYear()} Talib's Tour &amp; Travels. All rights reserved. Crafted with love in Kashmir.
         </div>

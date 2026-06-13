@@ -23,17 +23,21 @@ function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (isAdminLoggedIn()) navigate({ to: "/admin/dashboard" });
+    isAdminLoggedIn().then((loggedIn) => {
+      if (loggedIn) navigate({ to: "/admin/dashboard" });
+      else setChecking(false);
+    });
   }, [navigate]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
+    const ok = await loginAdmin(email, password);
     setLoading(false);
-    if (loginAdmin(email, password)) {
+    if (ok) {
       toast.success("Welcome back, Talib! 👋");
       navigate({ to: "/admin/dashboard" });
     } else {
@@ -47,6 +51,14 @@ function AdminLogin() {
 
   const inputCls =
     "w-full h-12 rounded-xl border border-border bg-white px-4 text-charcoal placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy transition-all";
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0A1F44 0%, #1d3a6e 50%, #4A90C4 100%)" }}>
+        <div className="w-10 h-10 rounded-full border-4 border-[#C9A84C] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <section
@@ -82,7 +94,7 @@ function AdminLogin() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@talibs.com"
+              placeholder="talibstourtravels@gmail.com"
               className={inputCls}
             />
           </div>
@@ -124,15 +136,6 @@ function AdminLogin() {
             {loading ? "Signing in…" : "Login"}
           </button>
         </form>
-
-        <div className="mt-5 text-center">
-          <a
-            href="#"
-            className="text-sm text-muted-foreground hover:text-navy hover:underline underline-offset-4 transition-colors"
-          >
-            Forgot Password?
-          </a>
-        </div>
 
         <p className="text-[11px] text-center text-muted-foreground mt-6">
           🔒 Secure Admin Access Only

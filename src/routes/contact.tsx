@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, MessageCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import PageShell from "@/components/PageShell";
 import PageHero from "@/components/PageHero";
+import { addEnquiry, loadSettings, DEFAULT_SETTINGS, type SiteSettings } from "@/lib/admin-data";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -19,21 +20,33 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
 
-  const submit = (e: React.FormEvent) => {
+  useEffect(() => { loadSettings().then(setSettings); }, []);
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const result = await addEnquiry({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      message: form.message,
+      source: "contact-form",
+    });
+    setLoading(false);
+    if (result) {
       toast.success("Message sent! We'll respond within 2 hours. 🎉");
       setForm({ name: "", email: "", phone: "", message: "" });
-    }, 900);
+    } else {
+      toast.error("Something went wrong. Please try WhatsApp or call us directly.");
+    }
   };
 
   const cards = [
-    { icon: MapPin, label: "Visit Us", value: "Srinagar, Kashmir, India", href: "#", color: "bg-emerald-brand" },
-    { icon: Phone, label: "Call Us", value: "+91 99999 99999", href: "tel:+919999999999", color: "bg-gold" },
-    { icon: Mail, label: "Email Us", value: "hello@talibstours.com", href: "mailto:hello@talibstours.com", color: "bg-kashmir-blue" },
+    { icon: MapPin, label: "Visit Us", value: settings.address, href: settings.locationUrl, color: "#4A90C4" },
+    { icon: Phone, label: "Call Us", value: settings.phone, href: `tel:${settings.phone.replace(/\s/g, "")}`, color: "#C9A84C" },
+    { icon: Mail, label: "Email Us", value: settings.email, href: `mailto:${settings.email}`, color: "#0A1F44" },
   ];
 
   return (
@@ -46,9 +59,9 @@ function ContactPage() {
           <p className="text-muted-foreground">Choose what's easiest — we're a message away.</p>
 
           {cards.map((c) => (
-            <a key={c.label} href={c.href} className="tilt-card flex items-center gap-4 p-5 rounded-2xl bg-white border border-border shadow-sm hover:shadow-xl transition-shadow">
-              <div className={`w-14 h-14 rounded-2xl ${c.color} text-white flex items-center justify-center shrink-0`}>
-                <c.icon className="w-6 h-6" />
+            <a key={c.label} href={c.href} target={c.label === "Visit Us" ? "_blank" : undefined} rel={c.label === "Visit Us" ? "noopener noreferrer" : undefined} className="tilt-card flex items-center gap-4 p-5 rounded-2xl bg-white border border-border shadow-sm hover:shadow-xl transition-shadow">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: c.color }}>
+                <c.icon className="w-6 h-6 text-white" />
               </div>
               <div>
                 <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{c.label}</div>
@@ -57,7 +70,10 @@ function ContactPage() {
             </a>
           ))}
 
-          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold btn-3d transition-all">
+          <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl font-bold btn-3d transition-all text-white"
+            style={{ background: "#0A1F44" }}
+          >
             <MessageCircle className="w-5 h-5" /> Chat on WhatsApp
           </a>
 
@@ -79,21 +95,21 @@ function ContactPage() {
 
           <div>
             <label className="text-sm font-semibold text-charcoal">Your Name</label>
-            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-emerald-brand transition-colors" placeholder="John Doe" />
+            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-[#C9A84C] transition-colors" placeholder="John Doe" />
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold text-charcoal">Email</label>
-              <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-emerald-brand" placeholder="you@email.com" />
+              <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-[#C9A84C]" placeholder="you@email.com" />
             </div>
             <div>
               <label className="text-sm font-semibold text-charcoal">Phone</label>
-              <input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-emerald-brand" placeholder="+91 …" />
+              <input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-[#C9A84C]" placeholder="+91 …" />
             </div>
           </div>
           <div>
             <label className="text-sm font-semibold text-charcoal">Message</label>
-            <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-emerald-brand resize-none" placeholder="Tell us about your dream Kashmir trip…" />
+            <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 focus:outline-none focus:border-[#C9A84C] resize-none" placeholder="Tell us about your dream Kashmir trip…" />
           </div>
           <button disabled={loading} className="w-full py-4 rounded-full bg-gradient-brand text-white font-bold btn-3d hover:-translate-y-0.5 transition-transform disabled:opacity-60">
             {loading ? "Sending…" : "Send Message →"}
@@ -102,13 +118,14 @@ function ContactPage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="rounded-3xl border-4 border-emerald-brand h-80 bg-gradient-to-br from-cream to-white flex items-center justify-center shadow-lg">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-emerald-brand mx-auto" />
-            <div className="mt-3 font-display text-2xl text-navy font-bold">Map Loading…</div>
-            <div className="text-sm text-muted-foreground mt-1">Srinagar, Kashmir, India</div>
+        <a href={settings.locationUrl} target="_blank" rel="noopener noreferrer" className="block rounded-3xl border-4 h-80 bg-gradient-to-br from-[#F0F4FF] to-white flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-shadow group" style={{ borderColor: "#4A90C4" }}>
+          <div className="text-center group-hover:scale-105 transition-transform">
+            <MapPin className="w-12 h-12 mx-auto" style={{ color: "#4A90C4" }} />
+            <div className="mt-3 font-display text-2xl text-navy font-bold">Srinagar, Kashmir</div>
+            <div className="text-sm text-muted-foreground mt-1">{settings.address}</div>
+            <div className="mt-4 text-xs font-bold text-[#4A90C4] bg-[#4A90C4]/10 px-4 py-2 rounded-full inline-block uppercase tracking-wide">Open in Google Maps →</div>
           </div>
-        </div>
+        </a>
       </section>
     </PageShell>
   );

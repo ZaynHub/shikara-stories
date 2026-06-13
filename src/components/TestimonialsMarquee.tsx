@@ -15,7 +15,7 @@ const reviews: Review[] = [
 ];
 
 const initials = (n: string) => n.split(/[\s&]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-const avatarColors = ["bg-emerald-brand", "bg-gold", "bg-kashmir-blue", "bg-navy"];
+const avatarColors = ["bg-[#4A90C4]", "bg-gold", "bg-kashmir-blue", "bg-navy"];
 
 function Card({ r, i }: { r: Review; i: number }) {
   return (
@@ -30,7 +30,7 @@ function Card({ r, i }: { r: Review; i: number }) {
           {initials(r.name)}
         </div>
         <div className="flex-1">
-          <div className="text-sm font-bold text-emerald-brand">{r.name}</div>
+          <div className="text-sm font-bold text-[#C9A84C]">{r.name}</div>
           <div className="text-xs text-muted-foreground">{r.city}</div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function TestimonialsMarquee() {
       <div className="text-center mt-10">
         <a
           href="https://www.google.com/maps" target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-emerald-brand text-emerald-brand font-semibold hover:bg-emerald-brand hover:text-white transition-all duration-300"
+          className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold hover:bg-[#4A90C4] hover:text-white transition-all duration-300"
         >
           Read All Google Reviews →
         </a>

@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, Mail, MessageCircle } from "lucide-react";
 import logo from "@/assets/talib-logo.png.asset.json";
+import { loadSettings, DEFAULT_SETTINGS, type SiteSettings } from "@/lib/admin-data";
 
 const navLinks: { label: string; to: string }[] = [
   { label: "Home", to: "/" },
@@ -15,11 +16,13 @@ const navLinks: { label: string; to: string }[] = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+    loadSettings().then(setSettings);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -29,14 +32,19 @@ export default function Navbar() {
       <div className="hidden md:block bg-navy text-gold">
         <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-between text-xs">
           <div className="flex items-center gap-5">
-            <a href="tel:+919999999999" className="flex items-center gap-1.5 hover:text-gold-soft transition-colors">
-              <Phone className="w-3.5 h-3.5" /> +91 99999 99999
+            <a href={`tel:${settings.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+              <Phone className="w-3.5 h-3.5" /> {settings.phone}
             </a>
-            <a href="mailto:hello@talibstours.com" className="flex items-center gap-1.5 hover:text-gold-soft transition-colors">
-              <Mail className="w-3.5 h-3.5" /> hello@talibstours.com
+            {settings.phone2 && (
+              <a href={`tel:${settings.phone2.replace(/\s/g, "")}`} className="hidden lg:flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+                <Phone className="w-3.5 h-3.5" /> {settings.phone2}
+              </a>
+            )}
+            <a href={`mailto:${settings.email}`} className="hidden md:flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+              <Mail className="w-3.5 h-3.5" /> {settings.email}
             </a>
           </div>
-          <a href="https://wa.me/919999999999" className="flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+          <a href={`https://wa.me/${settings.whatsapp}`} className="flex items-center gap-1.5 hover:text-gold-soft transition-colors">
             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp us
           </a>
         </div>
@@ -64,7 +72,7 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:flex flex-col leading-tight">
               <span className="font-display text-base md:text-lg font-bold text-navy">Talib's</span>
-              <span className="text-[10px] md:text-[11px] tracking-[0.18em] font-semibold text-emerald-brand uppercase">Tour &amp; Travels</span>
+              <span className="text-[10px] md:text-[11px] tracking-[0.18em] font-semibold uppercase" style={{ color: "#C9A84C" }}>Tour &amp; Travels</span>
             </div>
           </Link>
 
@@ -73,8 +81,8 @@ export default function Navbar() {
               <li key={l.label}>
                 <Link
                   to={l.to}
-                  className="relative px-3 py-2 text-sm font-medium text-charcoal/80 hover:text-emerald-brand transition-colors group"
-                  activeProps={{ className: "text-emerald-brand" }}
+                  className="relative px-3 py-2 text-sm font-medium text-charcoal/80 hover:text-[#C9A84C] transition-colors group"
+                  activeProps={{ className: "text-[#C9A84C]" }}
                   activeOptions={{ exact: true }}
                 >
                   {l.label}
@@ -85,12 +93,12 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <a
-              href="#contact"
+            <Link
+              to="/contact"
               className="hidden md:inline-flex items-center px-5 py-2.5 rounded-full bg-gold text-charcoal font-semibold text-sm btn-3d hover:[--tw:1] hover:-translate-y-0.5 hover:shadow-[0_10px_0_-2px_rgba(26,26,46,0.3),0_18px_30px_-10px_rgba(0,0,0,0.3)] transition-all"
             >
               Plan My Trip
-            </a>
+            </Link>
             <button
               aria-label="Toggle menu"
               onClick={() => setOpen((v) => !v)}
@@ -117,20 +125,20 @@ export default function Navbar() {
                     <Link
                       to={l.to}
                       onClick={() => setOpen(false)}
-                      className="block px-2 py-3 text-charcoal font-medium border-b border-border last:border-none hover:text-emerald-brand"
+                      className="block px-2 py-3 text-charcoal font-medium border-b border-border last:border-none hover:text-[#C9A84C]"
                     >
                       {l.label}
                     </Link>
                   </li>
                 ))}
                 <li className="pt-3">
-                  <a
-                    href="#contact"
+                  <Link
+                    to="/contact"
                     onClick={() => setOpen(false)}
                     className="block text-center px-5 py-3 rounded-full bg-gold text-charcoal font-semibold btn-3d"
                   >
                     Plan My Trip
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </motion.div>

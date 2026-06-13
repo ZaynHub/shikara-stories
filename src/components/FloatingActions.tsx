@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, MessageCircle } from "lucide-react";
+import { loadSettings, DEFAULT_SETTINGS } from "@/lib/admin-data";
 
 export default function FloatingActions() {
   const [showTop, setShowTop] = useState(false);
+  const [whatsapp, setWhatsapp] = useState(DEFAULT_SETTINGS.whatsapp);
+
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 300);
     window.addEventListener("scroll", onScroll, { passive: true });
+    loadSettings().then((s) => setWhatsapp(s.whatsapp));
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -14,15 +18,15 @@ export default function FloatingActions() {
     <>
       {/* WhatsApp */}
       <a
-        href="https://wa.me/919999999999"
+        href={`https://wa.me/${whatsapp}`}
         target="_blank"
         rel="noreferrer"
         className="group fixed bottom-6 right-6 z-50"
         aria-label="Chat with us on WhatsApp"
       >
-        <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping-ring" />
-        <span className="relative grid place-items-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-xl shadow-emerald-900/30 hover:scale-110 transition-transform">
-          <MessageCircle className="w-6 h-6" />
+        <span className="absolute inset-0 rounded-full animate-ping-ring" style={{ background: "#C9A84C" }} />
+        <span className="relative grid place-items-center w-14 h-14 rounded-full text-white shadow-xl hover:scale-110 transition-transform" style={{ background: "#C9A84C" }}>
+          <MessageCircle className="w-6 h-6" style={{ color: "#0A1F44" }} />
         </span>
         <span className="absolute right-16 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-md bg-charcoal text-white text-xs opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
           Chat with us on WhatsApp
