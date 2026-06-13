@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
-import heroVideo from "@/assets/kashmir-hero.mp4.asset.json";
+
+const HERO_VIDEO_URL = "/0609.mp4";
 
 export default function Hero() {
   return (
     <section className="relative w-full overflow-hidden bg-[#06152A] h-[100svh] md:h-screen">
       {/* Background video */}
       <video
-        src={heroVideo.url}
+        src={HERO_VIDEO_URL}
         autoPlay
         muted
         loop
