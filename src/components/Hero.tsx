@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const HERO_VIDEO_URL = "/0609.mp4";
+const HERO_VIDEO_URL = "https://skwxpbuvtrbnffuwvohg.supabase.co/storage/v1/object/public/media/hero-video.mp4";
 
 export default function Hero() {
   return (
